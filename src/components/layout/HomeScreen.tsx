@@ -31,7 +31,7 @@ export default function HomeScreen({ onContinueGame, onNewGame }: HomeScreenProp
       {/* Fixed header */}
       <div className="fixed top-0 left-0 right-0 z-30 bg-cream-50">
         <header className="h-14 flex items-center justify-between px-5">
-          <h1 className="text-xl font-heading text-cream-800">Reading Trip</h1>
+          <h1 className="text-xl tracking-wide text-cream-800" style={{ fontFamily: "var(--font-logo)" }}>Reading Trip</h1>
           <button
             onClick={() => setSettingsOpen(true)}
             className="w-10 h-10 rounded-full bg-cream-100 text-cream-600 hover:bg-cream-200 transition-colors flex items-center justify-center cursor-pointer"

@@ -10,7 +10,7 @@ export default function Header({ title, onOpenSettings, onOpenHistory, onBackToH
         <button onClick={onBackToHome} className="w-9 h-9 rounded-full flex items-center justify-center text-cream-500 hover:bg-cream-100 transition-colors cursor-pointer flex-shrink-0" title="返回首页">
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
         </button>
-        <h1 className="text-sm font-heading text-cream-800 truncate max-w-[160px]">{title || 'Reading Trip'}</h1>
+        <h1 className="text-sm tracking-wide text-cream-800 truncate max-w-[160px]" style={{ fontFamily: "var(--font-logo)" }}>{title || 'Reading Trip'}</h1>
       </div>
       <div className="flex items-center gap-1.5">
         {turnCount > 0 && <span className="text-xs text-cream-500 bg-cream-100 rounded-full px-2 py-0.5">{turnCount} 回合</span>}
