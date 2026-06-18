@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState } from 'react'
 import { useGameStore } from '../../stores/gameStore'
 import ChoiceCard from '../ui/ChoiceCard'
 import type { Choice } from '../../types/game'
@@ -14,20 +14,13 @@ export default function ChoicePanel({ onSelect, onCustomInput }: ChoicePanelProp
   const phase = useGameStore((s) => s.phase)
   const currentSegment = useGameStore((s) => s.currentSegment)
   const isTyping = useGameStore((s) => s.isTyping)
+  const turnCount = useGameStore((s) => s.turnCount)
   const [input, setInput] = useState('')
-  const [choicesVisible, setChoicesVisible] = useState(true)
-  const prevChoiceIdsRef = useRef('')
+  // Track the turn when user last made a selection — choices stay hidden
+  // until a NEW turn arrives (turnCount advances past lastSelectedTurn)
+  const [lastSelectedTurn, setLastSelectedTurn] = useState(-1)
   const choices = currentSegment?.choices ?? []
   const disabled = phase === 'loading' || isTyping || phase === 'gameOver'
-
-  // When new choices arrive (new segment), show them again
-  useEffect(() => {
-    const currentIds = choices.map((c) => c.id).join(',')
-    if (currentIds && currentIds !== prevChoiceIdsRef.current) {
-      setChoicesVisible(true)
-    }
-    prevChoiceIdsRef.current = currentIds
-  }, [choices])
 
   if (phase === 'idle') return null
 
@@ -42,10 +35,11 @@ export default function ChoicePanel({ onSelect, onCustomInput }: ChoicePanelProp
     )
   }
 
+  // Early return: nothing to show while loading with no choices
   if (choices.length === 0 && disabled) return null
 
   const handleSelect = (choice: Choice) => {
-    setChoicesVisible(false)
+    setLastSelectedTurn(turnCount)
     onSelect(choice)
   }
 
@@ -53,20 +47,22 @@ export default function ChoicePanel({ onSelect, onCustomInput }: ChoicePanelProp
     const val = input.trim()
     if (!val || disabled) return
 
-    // Check if input matches a letter choice (A/B/C/D...)
     const upper = val.toUpperCase()
     const idx = upper.charCodeAt(0) - 65
     if (upper.length === 1 && idx >= 0 && idx < choices.length) {
-      setChoicesVisible(false)
+      setLastSelectedTurn(turnCount)
       onSelect(choices[idx])
     } else {
-      // Free text input — send as custom action
       onCustomInput(val)
     }
     setInput('')
   }
 
-  const showChoices = choicesVisible && choices.length > 0 && !disabled
+  // Choices are visible when:
+  // 1. We have choices, AND
+  // 2. Not disabled (not loading/typing/gameOver), AND
+  // 3. The turn has advanced past when we last selected (new choices arrived)
+  const showChoices = choices.length > 0 && !disabled && turnCount > lastSelectedTurn
 
   return (
     <div className="px-4 sm:px-6 py-3">
@@ -90,7 +86,7 @@ export default function ChoicePanel({ onSelect, onCustomInput }: ChoicePanelProp
           <p className="text-xs text-cream-400 text-center">故事正在书写中...</p>
         )}
 
-        {/* Input — always visible */}
+        {/* Input — always visible when not disabled */}
         {!disabled && (
           <div className="flex items-center gap-2 pt-1">
             <input
