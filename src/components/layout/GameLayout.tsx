@@ -37,20 +37,13 @@ export default function GameLayout({ onChoice, onCustomInput }: GameLayoutProps)
           onOpenHistory={() => setHistoryOpen(true)} onBackToHome={handleBackToHome} />
       </div>
 
-      {/* Scrollable story area — padded for fixed header + bottom panel */}
-      <div className="flex-1 pt-12 min-h-0">
+      {/* Middle area: story + inline panels — scroll pushes content up when panels open */}
+      <div className="flex-1 pt-12 flex flex-col min-h-0 pb-[88px]">
         <StoryPanel />
-      </div>
 
-      {/* Fixed bottom choice/input panel */}
-      <div className="fixed bottom-0 left-0 right-0 z-30">
-        <ChoicePanel onSelect={onChoice} onCustomInput={onCustomInput} />
-      </div>
-
-      {historyOpen && (
-        <div className="fixed inset-0 z-40 flex flex-col justify-end">
-          <div className="absolute inset-0 bg-cream-900/15 backdrop-blur-sm" onClick={() => setHistoryOpen(false)} />
-          <div className="relative bg-white rounded-t-3xl shadow-cream-lg border-t border-cream-200 max-h-[70dvh] flex flex-col animate-slide-up">
+        {/* Inline history panel — pushes story content up */}
+        {historyOpen && (
+          <div className="flex-shrink-0 bg-white rounded-t-3xl shadow-cream-lg border-t border-cream-200 max-h-[50vh] flex flex-col animate-slide-up mx-2">
             <div className="flex justify-center pt-3 pb-1"><div className="w-10 h-1.5 rounded-full bg-cream-200" /></div>
             <div className="flex items-center justify-between px-5 py-2 border-b border-cream-100">
               <span className="text-sm font-heading text-cream-600">故事回顾</span>
@@ -60,10 +53,16 @@ export default function GameLayout({ onChoice, onCustomInput }: GameLayoutProps)
             </div>
             <div className="flex-1 overflow-y-auto p-4"><HistoryPanel embedded /></div>
           </div>
-        </div>
-      )}
+        )}
 
-      <SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)} />
+        {/* Inline settings panel — pushes story content up */}
+        <SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)} inline />
+      </div>
+
+      {/* Fixed bottom choice/input panel */}
+      <div className="fixed bottom-0 left-0 right-0 z-30">
+        <ChoicePanel onSelect={onChoice} onCustomInput={onCustomInput} />
+      </div>
     </div>
   )
 }

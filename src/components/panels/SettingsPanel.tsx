@@ -3,11 +3,11 @@ import { useSettingsStore } from '../../stores/settingsStore'
 import Modal from '../ui/Modal'
 import type { ModelId } from '../../types/settings'
 
-export default function SettingsPanel({ open, onClose }: { open: boolean; onClose: () => void }) {
+export default function SettingsPanel({ open, onClose, inline = false }: { open: boolean; onClose: () => void; inline?: boolean }) {
   const settings = useSettingsStore()
   const [localKey, setLocalKey] = useState(settings.apiKey)
   return (
-    <Modal open={open} onClose={onClose} title="设置">
+    <Modal open={open} onClose={onClose} title="设置" inline={inline}>
       <div className="space-y-5">
         <div>
           <label className="block text-sm font-semibold text-cream-700 mb-1.5">DeepSeek API Key</label>

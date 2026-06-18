@@ -49,29 +49,36 @@ export default function HomeScreen({ onContinueGame, onNewGame }: HomeScreenProp
         开启专属的互动阅读旅程吧！
       </p>
 
-      <div className="flex-1 overflow-y-auto px-4 py-1 pb-24">
-        {saves.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full text-center gap-4 pb-20">
-            <div className="w-28 h-28 rounded-3xl bg-cream-100 flex items-center justify-center mb-2">
-              <svg className="w-12 h-12 text-cream-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
-              </svg>
+      {/* Content area + inline panels */}
+      <div className="flex-1 flex flex-col min-h-0 pb-[100px]">
+        <div className="flex-1 overflow-y-auto px-4 py-1">
+          {saves.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-full text-center gap-4 pb-20">
+              <div className="w-28 h-28 rounded-3xl bg-cream-100 flex items-center justify-center mb-2">
+                <svg className="w-12 h-12 text-cream-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+                </svg>
+              </div>
+              <h2 className="text-lg font-heading text-cream-500">还没有阅读记录</h2>
+              <p className="text-sm text-cream-400 max-w-xs leading-relaxed">
+                开启专属的互动阅读旅程吧！
+              </p>
             </div>
-            <h2 className="text-lg font-heading text-cream-500">还没有阅读记录</h2>
-            <p className="text-sm text-cream-400 max-w-xs leading-relaxed">
-              开启专属的互动阅读旅程吧！
-            </p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 gap-3 pb-24">
-            {saves.map((save) => (
-              <SaveCard key={save.id} save={save} onContinue={handleContinue} onDelete={deleteSave} />
-            ))}
-          </div>
-        )}
+          ) : (
+            <div className="grid grid-cols-2 gap-3 pb-24">
+              {saves.map((save) => (
+                <SaveCard key={save.id} save={save} onContinue={handleContinue} onDelete={deleteSave} />
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Inline panels — push content up */}
+        <NewGamePanel open={newGameOpen} onClose={() => setNewGameOpen(false)} onStart={handleNewGame} inline />
+        <SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)} inline />
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-cream-50 via-cream-50/90 to-transparent">
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-cream-50 via-cream-50/90 to-transparent z-30">
         <button
           onClick={() => setNewGameOpen(true)}
           className="w-full py-4 rounded-2xl bg-cream-800 text-white font-heading text-base tracking-wide
@@ -80,9 +87,6 @@ export default function HomeScreen({ onContinueGame, onNewGame }: HomeScreenProp
           新建故事
         </button>
       </div>
-
-      <NewGamePanel open={newGameOpen} onClose={() => setNewGameOpen(false)} onStart={handleNewGame} />
-      <SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)} />
     </div>
   )
 }

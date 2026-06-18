@@ -14,7 +14,7 @@ export default function StoryPanel() {
 
   return (
     <div className="relative flex-1 overflow-hidden flex flex-col" ref={scrollRef}>
-      <div className="flex-1 overflow-y-auto px-4 sm:px-6 pt-4 pb-52 space-y-4">
+      <div className="flex-1 overflow-y-auto px-4 sm:px-6 pt-4 pb-24 space-y-4">
         {storyHistory.map((segment, idx) => {
           const isLatest = idx === storyHistory.length - 1
           // Skip the initial "请开始冒险" action from display

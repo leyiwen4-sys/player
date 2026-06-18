@@ -1,10 +1,27 @@
 import { useEffect, type ReactNode } from 'react'
 
-export default function Modal({ open, onClose, title, children }: { open: boolean; onClose: () => void; title: string; children: ReactNode }) {
+export default function Modal({ open, onClose, title, children, inline = false }: { open: boolean; onClose: () => void; title: string; children: ReactNode; inline?: boolean }) {
   useEffect(() => {
     if (open) { const h = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }; document.addEventListener('keydown', h); return () => document.removeEventListener('keydown', h) }
   }, [open, onClose])
   if (!open) return null
+
+  // Inline mode — panel pushes content, no overlay
+  if (inline) {
+    return (
+      <div className="bg-white rounded-t-3xl border-t border-cream-200 shadow-cream-lg max-h-[50vh] overflow-y-auto animate-slide-up flex-shrink-0">
+        <div className="flex items-center justify-between p-5 pb-3">
+          <h2 className="text-base font-heading text-cream-700">{title}</h2>
+          <button onClick={onClose} className="w-8 h-8 rounded-full bg-cream-100 text-cream-500 hover:bg-cream-200 transition-colors flex items-center justify-center cursor-pointer">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+          </button>
+        </div>
+        <div className="px-5 pb-5">{children}</div>
+      </div>
+    )
+  }
+
+  // Overlay mode (original)
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
       <div className="absolute inset-0 bg-cream-900/15 backdrop-blur-sm" onClick={onClose} />
