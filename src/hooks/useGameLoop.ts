@@ -50,7 +50,7 @@ export function useGameLoop() {
       }
 
       useGameStore.getState().appendSegment(segment)
-      useGameStore.setState({ setIsTyping: true })
+      useGameStore.getState().setIsTyping(true)
 
       // Sync to save store
       if (activeId) {
@@ -93,7 +93,7 @@ export function useGameLoop() {
           }
 
           useGameStore.getState().appendSegment(segment)
-          useGameStore.setState({ setIsTyping: true })
+          useGameStore.getState().setIsTyping(true)
 
           if (activeId) {
             const state = useGameStore.getState()
