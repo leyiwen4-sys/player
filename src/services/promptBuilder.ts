@@ -8,6 +8,8 @@ const SYSTEM_PROMPT_TEMPLATE = `你是一位富有创造力的互动故事叙述
 </WORLD_SETTING>
 
 <RULES>
+0. 【最重要的规则】绝对不要重复之前写过的句子、段落或情节。每一回合都必须推进故事向前发展。如果你发现自己要写和上一回合相似的场景，换一个角度、换一个地点、换一个事件。宁愿写一个新的小细节，也不要用旧的句子凑字数。重复是对故事的背叛。
+
 1. 每回合用 300-500 字的篇幅叙述下一段故事情节。这是最低要求——给文字足够的空间去呼吸、去描绘。
 
 2. 【感官描写】每一段叙述必须包含至少 2-3 种感官细节——不只是视觉（颜色、光影、形状），还要有听觉（风声、铃响、远处的脚步声）、嗅觉（花香、旧书的气息、雨后的泥土味）、触觉（指尖触碰的质感、温度、风吹过皮肤的触感）。让读者能"感觉"到这个世界。
@@ -78,18 +80,13 @@ export function buildConversationMessages(
     // Build from history: for each segment, store user action + assistant narrative
     for (let i = 0; i < storyHistory.length; i++) {
       const segment = storyHistory[i]
-      // The action that led TO this segment (or "begin" for first)
-      if (i === 0) {
-        messages.push({
-          role: 'user',
-          content: '请开始冒险。描绘开场场景，并给出我的第一个选择。',
-        })
-      } else {
-        messages.push({
-          role: 'user',
-          content: `我选择：${segment.chosenAction}`,
-        })
-      }
+      // Use the action's actual content to determine if it's the real first turn,
+      // rather than relying on array index (which breaks when context is summarized)
+      const isFirstTurn = i === 0 && segment.chosenAction.includes('请开始冒险')
+      messages.push({
+        role: 'user',
+        content: isFirstTurn ? segment.chosenAction : `我选择：${segment.chosenAction}`,
+      })
       // The AI's narrative for this segment
       if (!segment.isGameOver) {
         messages.push({
@@ -101,9 +98,13 @@ export function buildConversationMessages(
 
     // Add the current action that hasn't been responded to yet
     if (selectedAction) {
+      // Add a subtle anti-repetition nudge when context is long
+      const suffix = storyHistory.length > 6
+        ? '\n\n（请确保接下来的叙述推进到全新的场景或事件。不要重复之前出现过的句子或情节。）'
+        : ''
       messages.push({
         role: 'user',
-        content: `我选择：${selectedAction}`,
+        content: `我选择：${selectedAction}${suffix}`,
       })
     }
   }
