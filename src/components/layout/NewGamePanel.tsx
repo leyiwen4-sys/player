@@ -53,10 +53,9 @@ export default function NewGamePanel({ open, onClose, onStart, inline = false }:
   // Inline mode — panel pushes content, no overlay
   if (inline) {
     return (
-      <div className="bg-white rounded-t-3xl shadow-cream-lg border-t border-cream-200 max-h-[50vh] flex flex-col animate-slide-up flex-shrink-0 mx-2">
-        <div className="flex justify-center pt-3 pb-1"><div className="w-10 h-1.5 rounded-full bg-cream-200" /></div>
-        <div className="flex items-center justify-between px-5 py-2 border-b border-cream-100">
-          <span className="text-sm font-heading text-cream-700">新建故事</span>
+      <div className="bg-white rounded-3xl shadow-cream border border-cream-200 max-h-[50vh] flex flex-col animate-fade-in-up flex-shrink-0 mx-3 my-2">
+        <div className="flex items-center justify-between px-5 py-3">
+          <span className="text-base font-heading text-cream-700">新建故事</span>
           <button onClick={onClose} className="w-8 h-8 rounded-full bg-cream-100 text-cream-500 hover:bg-cream-200 transition-colors flex items-center justify-center cursor-pointer">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
           </button>

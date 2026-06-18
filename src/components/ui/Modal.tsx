@@ -9,7 +9,7 @@ export default function Modal({ open, onClose, title, children, inline = false }
   // Inline mode — panel pushes content, no overlay
   if (inline) {
     return (
-      <div className="bg-white rounded-t-3xl border-t border-cream-200 shadow-cream-lg max-h-[50vh] overflow-y-auto animate-slide-up flex-shrink-0">
+      <div className="bg-white rounded-3xl border border-cream-200 shadow-cream max-h-[50vh] overflow-y-auto animate-fade-in-up flex-shrink-0 mx-3 my-2">
         <div className="flex items-center justify-between p-5 pb-3">
           <h2 className="text-base font-heading text-cream-700">{title}</h2>
           <button onClick={onClose} className="w-8 h-8 rounded-full bg-cream-100 text-cream-500 hover:bg-cream-200 transition-colors flex items-center justify-center cursor-pointer">
