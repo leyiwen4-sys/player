@@ -69,8 +69,8 @@ export default function ChoicePanel({ onSelect, onCustomInput }: ChoicePanelProp
   const showChoices = choicesVisible && choices.length > 0 && !disabled
 
   return (
-    <div className="px-4 sm:px-6 py-3 bg-gradient-to-t from-cream-50 via-white/95 to-transparent backdrop-blur-sm">
-      <div className="space-y-2.5 max-w-lg mx-auto">
+    <div className="px-4 sm:px-6 py-3">
+      <div className="space-y-3 max-w-lg mx-auto">
         {/* Choice hint + cards — collapsible */}
         <div className={`transition-all duration-300 ease-out overflow-hidden ${
           showChoices ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0'
