@@ -41,7 +41,7 @@ export function useGameLoop() {
         timestamp: Date.now(),
         narrative: aiResponse.narrative,
         choices: aiResponse.choices.map((c, i) => ({
-          id: `choice-${i}`,
+          id: `${segment.id}-choice-${i}`,
           text: c.text,
         })),
         chosenAction: action,
