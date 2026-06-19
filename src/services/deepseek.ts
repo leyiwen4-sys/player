@@ -1,16 +1,23 @@
-import OpenAI from 'openai'
 import type { AIMessage } from '../types/api'
 
-let client: OpenAI | null = null
+type OpenAIClient = InstanceType<typeof import('openai').default>
 
-export function getClient(apiKey: string): OpenAI {
-  if (!client || (client as unknown as { apiKey: string }).apiKey !== apiKey) {
-    client = new OpenAI({
-      baseURL: 'https://api.deepseek.com',
-      apiKey,
-      dangerouslyAllowBrowser: true,
-    })
+let clientPromise: Promise<OpenAIClient> | null = null
+let currentApiKey = ''
+
+async function getClient(apiKey: string): Promise<OpenAIClient> {
+  if (clientPromise && currentApiKey === apiKey) {
+    return clientPromise
   }
+  currentApiKey = apiKey
+  const { default: OpenAI } = await import('openai')
+  const client = new OpenAI({
+    baseURL: 'https://api.deepseek.com',
+    apiKey,
+    dangerouslyAllowBrowser: true,
+  })
+  // Cache the resolved client directly
+  clientPromise = Promise.resolve(client)
   return client
 }
 
@@ -21,11 +28,11 @@ export async function sendMessage(
   temperature: number,
   maxTokens: number
 ): Promise<string> {
-  const openai = getClient(apiKey)
+  const openai = await getClient(apiKey)
 
   const response = await openai.chat.completions.create({
     model,
-    messages: messages as OpenAI.Chat.Completions.ChatCompletionMessageParam[],
+    messages: messages as any,
     temperature,
     max_tokens: maxTokens,
     response_format: { type: 'json_object' },
