@@ -45,13 +45,23 @@ export default function NewGamePanel({ open, onClose, onStart, inline = false }:
       } else if (ext === 'docx' || ext === 'doc') {
         // Try mammoth for both .docx and .doc (many .doc files are actually .docx ZIPs)
         const buf = await file.arrayBuffer()
-        // Check if it's really a ZIP-based docx (starts with PK magic bytes)
-        const isZip = new Uint8Array(buf.slice(0, 2))[0] === 0x50 && new Uint8Array(buf.slice(0, 2))[1] === 0x4B
-        if (isZip) {
+        if (buf.byteLength < 4) {
+          setUploadError('文件太小，不是有效的 Word 文档')
+          return
+        }
+        const header = new Uint8Array(buf.slice(0, 4))
+        // ZIP files start with PK (0x50 0x4B)
+        const isZip = header[0] === 0x50 && header[1] === 0x4B
+        if (!isZip) {
+          setUploadError('旧版 .doc 格式不支持（非 ZIP 格式），请用 Word 或 WPS 打开后另存为 .docx 或 .txt 再上传')
+          return
+        }
+        try {
           const result = await mammoth.extractRawText({ arrayBuffer: buf })
           content = result.value
-        } else {
-          setUploadError('旧版 .doc 格式不支持，请用 Word 或 WPS 另存为 .docx 或 .txt 后再上传')
+        } catch (mammothErr) {
+          const msg = mammothErr instanceof Error ? mammothErr.message : String(mammothErr)
+          setUploadError(`无法解析此文档（${msg}），请尝试另存为 .txt 后再上传`)
           return
         }
       } else {
