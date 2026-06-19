@@ -58,7 +58,6 @@ export default function NewGamePanel({ open, onClose, onStart, inline = false }:
         }
         try {
           const mammothModule = await import('mammoth')
-          console.log('[NewGamePanel] mammoth loaded:', Object.keys(mammothModule))
           if (!mammothModule.extractRawText) {
             setUploadError('文档解析库加载失败，请用 WPS 另存为 .txt 后再上传')
             return
@@ -67,8 +66,12 @@ export default function NewGamePanel({ open, onClose, onStart, inline = false }:
           content = result.value
         } catch (mammothErr) {
           const msg = mammothErr instanceof Error ? mammothErr.message : String(mammothErr)
-          console.error('[NewGamePanel] mammoth error:', mammothErr)
-          setUploadError(`无法解析此文档（${msg}），请尝试另存为 .txt 后再上传`)
+          // Dynamic import failed — probably stale cache after deployment
+          if (msg.includes('Failed to fetch dynamically imported module')) {
+            setUploadError('页面需要刷新（检测到版本更新），请按 Ctrl+Shift+R 刷新后再上传')
+          } else {
+            setUploadError(`无法解析此文档（${msg}），请尝试另存为 .txt 后再上传`)
+          }
           return
         }
       } else {
