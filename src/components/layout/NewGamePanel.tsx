@@ -30,9 +30,21 @@ export default function NewGamePanel({ open, onClose, onStart, inline = false }:
         return
       }
       const ext = file.name.split('.').pop()?.toLowerCase(); let content = ''
-      if (ext === 'txt') content = await file.text()
-      else if (ext === 'docx' || ext === 'doc') {
-        content = (await mammoth.extractRawText({ arrayBuffer: await file.arrayBuffer() })).value
+      if (ext === 'txt') {
+        // Try UTF-8 first, fall back to GBK for Chinese Windows files
+        try {
+          content = await file.text()
+        } catch {
+          // Some encodings may fail — try reading as array buffer and decode
+          const buf = await file.arrayBuffer()
+          try { content = new TextDecoder('utf-8').decode(buf) } catch { /* fall through */ }
+          if (!content.trim()) {
+            try { content = new TextDecoder('gbk').decode(buf) } catch { /* fall through */ }
+          }
+        }
+      } else if (ext === 'docx') {
+        const result = await mammoth.extractRawText({ arrayBuffer: await file.arrayBuffer() })
+        content = result.value
       } else {
         setUploadError(`不支持的文件格式 .${ext}，请上传 TXT 或 DOCX 文件`)
         return
@@ -45,8 +57,10 @@ export default function NewGamePanel({ open, onClose, onStart, inline = false }:
       if (content.length > 10000) {
         setUploadError(`文件内容较长（约${Math.round(content.length / 1000)}千字），AI 可能无法完整处理，建议精简后再上传`)
       }
-    } catch {
-      setUploadError('文件读取失败，请确认文件未损坏且格式正确')
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err)
+      console.error('[NewGamePanel] File upload error:', msg)
+      setUploadError(`文件读取失败：${msg || '未知错误'}`)
     }
   }, [])
 
