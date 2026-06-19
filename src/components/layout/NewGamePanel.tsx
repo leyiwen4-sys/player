@@ -1,8 +1,7 @@
 import { useState, useRef, useCallback } from 'react'
-import { flushSync } from 'react-dom'
 import { useSettingsStore } from '../../stores/settingsStore'
 import { useResourceStore } from '../../stores/resourceStore'
-import mammoth from 'mammoth'
+import * as mammoth from 'mammoth'
 
 type Tab = 'text' | 'file' | 'history'
 
@@ -73,19 +72,15 @@ export default function NewGamePanel({ open, onClose, onStart, inline = false }:
         setUploadError('文件内容为空，请检查文件')
         return
       }
-      flushSync(() => {
-        setText(content.trim())
-        setUploadedName(file.name)
-      })
+      setText(content.trim())
+      setUploadedName(file.name)
       if (content.length > 10000) {
         setUploadError(`文件内容较长（约${Math.round(content.length / 1000)}千字），AI 可能无法完整处理，建议精简后再上传`)
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err)
       console.error('[NewGamePanel] File upload error:', msg)
-      flushSync(() => {
-        setUploadError(`文件读取失败：${msg || '未知错误'}`)
-      })
+      setUploadError(`文件读取失败：${msg || '未知错误'}`)
     }
   }, [])
 
