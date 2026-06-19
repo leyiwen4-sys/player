@@ -30,21 +30,30 @@ export default function NewGamePanel({ open, onClose, onStart, inline = false }:
         return
       }
       const ext = file.name.split('.').pop()?.toLowerCase(); let content = ''
+
       if (ext === 'txt') {
         // Try UTF-8 first, fall back to GBK for Chinese Windows files
         try {
           content = await file.text()
         } catch {
-          // Some encodings may fail — try reading as array buffer and decode
           const buf = await file.arrayBuffer()
           try { content = new TextDecoder('utf-8').decode(buf) } catch { /* fall through */ }
           if (!content.trim()) {
             try { content = new TextDecoder('gbk').decode(buf) } catch { /* fall through */ }
           }
         }
-      } else if (ext === 'docx') {
-        const result = await mammoth.extractRawText({ arrayBuffer: await file.arrayBuffer() })
-        content = result.value
+      } else if (ext === 'docx' || ext === 'doc') {
+        // Try mammoth for both .docx and .doc (many .doc files are actually .docx ZIPs)
+        const buf = await file.arrayBuffer()
+        // Check if it's really a ZIP-based docx (starts with PK magic bytes)
+        const isZip = new Uint8Array(buf.slice(0, 2))[0] === 0x50 && new Uint8Array(buf.slice(0, 2))[1] === 0x4B
+        if (isZip) {
+          const result = await mammoth.extractRawText({ arrayBuffer: buf })
+          content = result.value
+        } else {
+          setUploadError('旧版 .doc 格式不支持，请用 Word 或 WPS 另存为 .docx 或 .txt 后再上传')
+          return
+        }
       } else {
         setUploadError(`不支持的文件格式 .${ext}，请上传 TXT 或 DOCX 文件`)
         return
