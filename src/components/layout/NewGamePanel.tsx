@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback } from 'react'
 import { useSettingsStore } from '../../stores/settingsStore'
 import { useResourceStore } from '../../stores/resourceStore'
-import * as mammoth from 'mammoth'
+// mammoth is dynamically imported — only loaded when user uploads a .docx file
 
 type Tab = 'text' | 'file' | 'history'
 
@@ -57,7 +57,8 @@ export default function NewGamePanel({ open, onClose, onStart, inline = false }:
           return
         }
         try {
-          const result = await mammoth.extractRawText({ arrayBuffer: buf })
+          const mammothModule = await import('mammoth')
+          const result = await mammothModule.extractRawText({ arrayBuffer: buf })
           content = result.value
         } catch (mammothErr) {
           const msg = mammothErr instanceof Error ? mammothErr.message : String(mammothErr)
