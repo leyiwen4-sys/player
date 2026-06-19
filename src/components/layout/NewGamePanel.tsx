@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, startTransition } from 'react'
 import { useSettingsStore } from '../../stores/settingsStore'
 import { useResourceStore } from '../../stores/resourceStore'
 // mammoth is dynamically imported — only loaded when user uploads a .docx file
@@ -26,7 +26,7 @@ export default function NewGamePanel({ open, onClose, onStart, inline = false }:
     try {
       const MAX_SIZE = 512 * 1024 // 512KB max
       if (file.size > MAX_SIZE) {
-        setUploadError(`文件过大（${(file.size / 1024).toFixed(0)}KB），请上传小于 512KB 的文件`)
+        startTransition(() => setUploadError(`文件过大（${(file.size / 1024).toFixed(0)}KB），请上传小于 512KB 的文件`))
         return
       }
       const ext = file.name.split('.').pop()?.toLowerCase(); let content = ''
@@ -79,18 +79,20 @@ export default function NewGamePanel({ open, onClose, onStart, inline = false }:
         return
       }
       if (!content.trim()) {
-        setUploadError('文件内容为空，请检查文件')
+        startTransition(() => setUploadError('文件内容为空，请检查文件'))
         return
       }
-      setText(content.trim())
-      setUploadedName(file.name)
+      startTransition(() => {
+        setText(content.trim())
+        setUploadedName(file.name)
+      })
       if (content.length > 10000) {
-        setUploadError(`文件内容较长（约${Math.round(content.length / 1000)}千字），AI 可能无法完整处理，建议精简后再上传`)
+        startTransition(() => setUploadError(`文件内容较长（约${Math.round(content.length / 1000)}千字），AI 可能无法完整处理，建议精简后再上传`))
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err)
       console.error('[NewGamePanel] File upload error:', msg)
-      setUploadError(`文件读取失败：${msg || '未知错误'}`)
+      startTransition(() => setUploadError(`文件读取失败：${msg || '未知错误'}`))
     }
   }, [])
 
