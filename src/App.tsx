@@ -3,6 +3,7 @@ import { useSaveStore } from './stores/saveStore'
 import { useGameLoop } from './hooks/useGameLoop'
 import HomeScreen from './components/layout/HomeScreen'
 import GameLayout from './components/layout/GameLayout'
+import ErrorBoundary from './components/ui/ErrorBoundary'
 
 export default function App() {
   const phase = useGameStore((s) => s.phase)
@@ -10,15 +11,16 @@ export default function App() {
   const activeSaveId = useSaveStore((s) => s.activeSaveId)
   const { startNewGame, selectChoice, sendCustomInput, loadSave } = useGameLoop()
 
-  // If we have an active save and game phase is not idle, show game
   if (activeSaveId && phase !== 'idle') {
-    return <GameLayout onChoice={selectChoice} onCustomInput={sendCustomInput} />
+    return <ErrorBoundary><GameLayout onChoice={selectChoice} onCustomInput={sendCustomInput} /></ErrorBoundary>
   }
 
   return (
-    <HomeScreen
-      onContinueGame={(saveId) => loadSave(saveId)}
-      onNewGame={(worldSetting, title) => startNewGame(worldSetting, title)}
-    />
+    <ErrorBoundary>
+      <HomeScreen
+        onContinueGame={(saveId) => loadSave(saveId)}
+        onNewGame={(worldSetting, title) => startNewGame(worldSetting, title)}
+      />
+    </ErrorBoundary>
   )
 }

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState } from 'react'
 import { useGameStore } from '../../stores/gameStore'
 import ChoiceCard from '../ui/ChoiceCard'
 import type { Choice } from '../../types/game'
@@ -15,30 +15,10 @@ export default function ChoicePanel({ onSelect, onCustomInput }: ChoicePanelProp
   const currentSegment = useGameStore((s) => s.currentSegment)
   const isTyping = useGameStore((s) => s.isTyping)
   const turnCount = useGameStore((s) => s.turnCount)
-  const setIsTyping = useGameStore((s) => s.setIsTyping)
   const [input, setInput] = useState('')
   const [lastSelectedTurn, setLastSelectedTurn] = useState(-1)
   const choices = currentSegment?.choices ?? []
   const disabled = phase === 'loading' || isTyping || phase === 'gameOver'
-  const typingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-
-  // Safety net: if isTyping stays true >15s, something broke the animation — force it off
-  useEffect(() => {
-    if (isTyping) {
-      typingTimerRef.current = setTimeout(() => {
-        console.warn('[ChoicePanel] isTyping stuck for 15s — forcing off')
-        setIsTyping(false)
-      }, 15000)
-    } else {
-      if (typingTimerRef.current) clearTimeout(typingTimerRef.current)
-    }
-    return () => { if (typingTimerRef.current) clearTimeout(typingTimerRef.current) }
-  }, [isTyping, setIsTyping])
-
-  // Debug: log state transitions
-  useEffect(() => {
-    console.log('[ChoicePanel]', { phase, turnCount, lastSelectedTurn, isTyping, disabled, choicesLen: choices.length, showChoices: choices.length > 0 && !disabled && turnCount > lastSelectedTurn })
-  }, [phase, turnCount, lastSelectedTurn, isTyping, disabled, choices.length])
 
   if (phase === 'idle') return null
 
