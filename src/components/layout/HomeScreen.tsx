@@ -74,8 +74,8 @@ export default function HomeScreen({ onContinueGame, onNewGame }: HomeScreenProp
         </div>
 
         {/* Inline panels — push content up */}
-        <NewGamePanel open={newGameOpen} onClose={() => setNewGameOpen(false)} onStart={handleNewGame} inline />
-        <SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)} inline />
+        {newGameOpen && <NewGamePanel key="newgame" open={newGameOpen} onClose={() => setNewGameOpen(false)} onStart={handleNewGame} inline />}
+        {settingsOpen && <SettingsPanel key="settings" open={settingsOpen} onClose={() => setSettingsOpen(false)} inline />}
       </div>
 
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-cream-50 via-cream-50/90 to-transparent z-30">

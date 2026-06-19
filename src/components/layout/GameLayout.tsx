@@ -60,7 +60,7 @@ export default function GameLayout({ onChoice, onCustomInput }: GameLayoutProps)
         )}
 
         {/* Settings card */}
-        <SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)} inline />
+        {settingsOpen && <SettingsPanel key="settings" open={settingsOpen} onClose={() => setSettingsOpen(false)} inline />}
       </div>
     </div>
   )

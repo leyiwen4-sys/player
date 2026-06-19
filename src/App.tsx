@@ -12,11 +12,11 @@ export default function App() {
   const { startNewGame, selectChoice, sendCustomInput, loadSave } = useGameLoop()
 
   if (activeSaveId && phase !== 'idle') {
-    return <ErrorBoundary><GameLayout onChoice={selectChoice} onCustomInput={sendCustomInput} /></ErrorBoundary>
+    return <ErrorBoundary key="game"><GameLayout onChoice={selectChoice} onCustomInput={sendCustomInput} /></ErrorBoundary>
   }
 
   return (
-    <ErrorBoundary>
+    <ErrorBoundary key="home">
       <HomeScreen
         onContinueGame={(saveId) => loadSave(saveId)}
         onNewGame={(worldSetting, title) => startNewGame(worldSetting, title)}
