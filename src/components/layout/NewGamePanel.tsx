@@ -14,6 +14,7 @@ export default function NewGamePanel({ open, onClose, onStart, inline = false }:
   const [text, setText] = useState('')
   const [title, setTitle] = useState('')
   const [uploadedName, setUploadedName] = useState<string | null>(null)
+  const [uploadError, setUploadError] = useState<string | null>(null)
   const [dragOver, setDragOver] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
   const apiKey = useSettingsStore((s) => s.apiKey)
@@ -21,14 +22,32 @@ export default function NewGamePanel({ open, onClose, onStart, inline = false }:
   const canStart = apiKey.trim() && text.trim()
 
   const handleFile = useCallback(async (file: File) => {
+    setUploadError(null)
     try {
+      const MAX_SIZE = 512 * 1024 // 512KB max
+      if (file.size > MAX_SIZE) {
+        setUploadError(`文件过大（${(file.size / 1024).toFixed(0)}KB），请上传小于 512KB 的文件`)
+        return
+      }
       const ext = file.name.split('.').pop()?.toLowerCase(); let content = ''
       if (ext === 'txt') content = await file.text()
       else if (ext === 'docx' || ext === 'doc') {
         content = (await mammoth.extractRawText({ arrayBuffer: await file.arrayBuffer() })).value
-      } else return
-      if (content.trim()) { setText(content.trim()); setUploadedName(file.name) }
-    } catch { /* ignore */ }
+      } else {
+        setUploadError(`不支持的文件格式 .${ext}，请上传 TXT 或 DOCX 文件`)
+        return
+      }
+      if (!content.trim()) {
+        setUploadError('文件内容为空，请检查文件')
+        return
+      }
+      setText(content.trim()); setUploadedName(file.name)
+      if (content.length > 10000) {
+        setUploadError(`文件内容较长（约${Math.round(content.length / 1000)}千字），AI 可能无法完整处理，建议精简后再上传`)
+      }
+    } catch {
+      setUploadError('文件读取失败，请确认文件未损坏且格式正确')
+    }
   }, [])
 
   const handleDrop = useCallback((e: React.DragEvent) => {
@@ -100,6 +119,9 @@ export default function NewGamePanel({ open, onClose, onStart, inline = false }:
               </div>
               {uploadedName && text && (
                 <div className="mt-3 p-3 rounded-2xl bg-cream-50 border border-cream-100 text-xs text-cream-600 max-h-32 overflow-y-auto leading-relaxed whitespace-pre-wrap">{text.slice(0, 300)}{text.length > 300 ? '...' : ''}</div>
+              )}
+              {uploadError && (
+                <div className="mt-3 p-3 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-700">{uploadError}</div>
               )}
             </>
           )}
@@ -200,6 +222,9 @@ export default function NewGamePanel({ open, onClose, onStart, inline = false }:
               </div>
               {uploadedName && text && (
                 <div className="mt-3 p-3 rounded-2xl bg-cream-50 border border-cream-100 text-xs text-cream-600 max-h-32 overflow-y-auto leading-relaxed whitespace-pre-wrap">{text.slice(0, 300)}{text.length > 300 ? '...' : ''}</div>
+              )}
+              {uploadError && (
+                <div className="mt-3 p-3 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-700">{uploadError}</div>
               )}
             </>
           )}
